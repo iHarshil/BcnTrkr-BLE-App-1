@@ -7,17 +7,22 @@
 //
 
 import UIKit
-
+import SVProgressHUD
 import CoreBluetooth
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var btnScan: UIBarButtonItem!
+    
     let cellReuseIdentifier = "cellID"
     
     var arrayPeripheralsList = Array<CBPeripheral>()
     var centralManager = CBCentralManager()
+    var blePeripheral : CBPeripheral?
     
+    var timer = Timer()
+    var characteristics = [String:CBCharacteristic]()
     
     
     override func viewDidLoad() {
@@ -27,7 +32,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         self.tableView.tableFooterView = UIView()
         
-        centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+        centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -50,16 +55,29 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         {
             cell?.textLabel?.text = "Unknown Device"
         }
-        
+        cell?.detailTextLabel?.text = peripheral.identifier.uuidString
         return cell!
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You tapped cell number \(indexPath.row).")
+        
+        let deviceDetailVC = storyboard?.instantiateViewController(withIdentifier: "deviceDetailVC") as! DeviceDetailViewController
+        deviceDetailVC.peripheralDetails = arrayPeripheralsList[indexPath.row]
+        navigationController?.show(deviceDetailVC, sender: self)
     }
     
     @IBAction func btnScanTap(_ sender: UIBarButtonItem) {
+        if sender.title == "SCAN" {
+            arrayPeripheralsList.removeAll()
+            self.tableView.reloadData()
+            startScan()
+            sender.title = "STOP"
+        }
+        else
+        {
+            cancelScan()
+        }
     }
 }
 
@@ -78,28 +96,58 @@ extension ViewController : CBCentralManagerDelegate
             print("central.state is .unauthorized...")
         case .poweredOff:
             print("central.state is .poweredOff...")
+            //If Bluetooth is off, display a UI alert message saying "Bluetooth is not enable" and "Make sure that your bluetooth is turned on"
+            print("Bluetooth Disabled- Make sure your Bluetooth is turned on")
+            
+            let alertVC = UIAlertController(title: "Bluetooth is not enabled", message: "Make sure that your bluetooth is turned on", preferredStyle: UIAlertController.Style.alert)
+            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
+                self.dismiss(animated: true, completion: nil)
+            })
+            alertVC.addAction(action)
+            self.present(alertVC, animated: true, completion: nil)
         case .poweredOn:
             print("central.state is .poweredOn...")
             
-            centralManager.scanForPeripherals(withServices: nil, options: nil)
+            startScan()
         }
     }
     
+    func startScan() {
+        print("Now Scanning...")
+        SVProgressHUD.show(withStatus: "Please wait...")
+        self.timer.invalidate()
+        centralManager.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey:false])
+        Timer.scheduledTimer(timeInterval: 17, target: self, selector:#selector(cancelScan), userInfo: nil, repeats: false)
+//        centralManager.scanForPeripherals(withServices: [BLEService_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey:false])
+        
+    }
+    
+    /*We also need to stop scanning at some point so we'll also create a function that calls "stopScan"*/
+    @objc func cancelScan() {
+        self.centralManager.stopScan()
+        SVProgressHUD.dismiss()
+        print("Scan Stopped")
+        print("Number of Peripherals Found: \(arrayPeripheralsList.count)")
+        btnScan.title = "SCAN"
+    }
+
+    
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
-        if let uniqueID = (advertisementData["kCBAdvDataManufacturerData"])
-        {
-            print("Unique ID\(uniqueID)")
-        }
-        print(peripheral)
-        print(advertisementData)
-        print("RSSI Number\(RSSI)")
-
-        
-//        centralManager.connect(peripheral, options: nil)
-        
+        blePeripheral = peripheral
         arrayPeripheralsList.append(peripheral)
         tableView.reloadData()
+        
+        if blePeripheral == nil {
+            print("Found new pheripheral devices with services")
+            print("Peripheral name: \(peripheral.name as String?)")
+            print("Peripheral id: \(peripheral.identifier)")
+            print("RSSI Number: \(RSSI)")
+            print("**********************************")
+            print ("Advertisement Data : \(advertisementData)")
+        }
+        
+//        centralManager.connect(peripheral, options: nil)
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
