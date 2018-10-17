@@ -1,0 +1,6 @@
+framework module Pods_Beacon_Tracker {
+  umbrella header "Pods-Beacon Tracker-umbrella.h"
+
+  export *
+  module * { export * }
+}

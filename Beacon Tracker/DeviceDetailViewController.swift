@@ -14,13 +14,68 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
     @IBOutlet weak var collectionView: UICollectionView!
     
     let reuseIdentifier = "DetailCollectionCell"
-    var titleText = ["Signal:","Connection:", "Distance:", "Battery:", "Time:"]
+    var titleText = ["Signal:", "Connection:", "Distance:", "Battery:", "Time:"]
     var peripheralDetails : CBPeripheral!
+    var rSSINo = Int()
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        print(peripheralDetails)
+    }
+    
+    func getConnectionStatus() -> String {
+        var state = ""
+        if peripheralDetails.state == .disconnected {
+            state = "Disconnected"
+        }
+        else if peripheralDetails.state == .connected {
+            state = "Connected"
+        }
+        else if peripheralDetails.state == .connecting {
+            state = "Connecting"
+        }
+        else
+        {
+            state = "Disconnecting"
+        }
+        return state
+    }
+    func getDistance(rssi: Int) -> String {
+        
+        var strDistance = ""
+        
+        if rssi == Int(-1.0) {
+            // -1.0 is passed back by the SDK to indicate an unknown distance
+            strDistance = "Unknown"
+        }
+        else if rssi >= -40 {
+            strDistance = "Immediate"
+        }
+        else if rssi < -40 && rssi >= -60 {
+            strDistance = "Near"
+        }
+        else if rssi < -60 {
+            strDistance = "Far"
+        }
+        return strDistance
+    }
+    func getCurrentDateTime() -> String {
+        let currentDateTime = Date()
+        let formatter = DateFormatter()
+        
+        formatter.timeStyle = .medium
+        formatter.dateStyle = .medium
+        
+        return formatter.string(from: currentDateTime)
+    }
+    
+    func getCurrentBatteryLevel() -> Float {
+        return UIDevice.current.batteryLevel
     }
     
     // MARK: - UICollectionViewDataSource protocol
@@ -39,19 +94,40 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailCollectionCell", for: indexPath) as! DetailCollectionCell
         
-        cell.contentView.layer.cornerRadius = 2.0
+        cell.backgroundColor = UIColor.white
+        cell.contentView.layer.cornerRadius = 10.0
         cell.contentView.layer.borderWidth = 1.0
         cell.contentView.layer.borderColor = UIColor.clear.cgColor
         cell.contentView.layer.masksToBounds = true
         
+//        cell.layer.backgroundColor = UIColor.clear.cgColor
         cell.layer.shadowColor = UIColor.lightGray.cgColor
         cell.layer.shadowOffset = CGSize(width: 0, height: 2.0)
         cell.layer.shadowRadius = 2.0
-        cell.layer.shadowOpacity = 0.5
+        cell.layer.shadowOpacity = 1.0
         cell.layer.masksToBounds = false
         cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.contentView.layer.cornerRadius).cgPath
-        
-        cell.lblTitle.text = titleText[indexPath.item]
+        if indexPath.section == 0 {
+            cell.lblTitle.text = titleText[indexPath.item]
+            cell.lblDetail.text = String(format: "%d", rSSINo)
+        }
+        else
+        {
+            cell.lblTitle.text = titleText[indexPath.item + 1]
+            switch indexPath.row {
+                
+            case 0:
+                cell.lblDetail.text = getConnectionStatus()
+            case 1:
+                cell.lblDetail.text = getDistance(rssi: rSSINo)
+            case 2:
+                cell.lblDetail.text = String(format: "%.0f%%", getCurrentBatteryLevel() * 100)
+            case 3:
+                cell.lblDetail.text = getCurrentDateTime()
+            default:
+                break
+            }
+        }
         return cell
         
     }
@@ -75,7 +151,7 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
 //        let cellHeight = collectionView.bounds.height
         if indexPath.section == 0 {
             
-            return CGSize(width: collectionCellSize, height: collectionView.frame.size.height/2 * 0.40)
+            return CGSize(width: collectionCellSize+16.0, height: collectionView.frame.size.height/2 * 0.50)
             
         }
         else
@@ -84,6 +160,11 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
         }
     }
     
+    @IBAction func btnLocationTap(_ sender: UIBarButtonItem) {
+        let deviceLocationVC = storyboard?.instantiateViewController(withIdentifier: "deviceLocationVC") as! DeviceLocationViewController
+        
+        navigationController?.show(deviceLocationVC, sender: self)
+    }
     @IBAction func btnBackTap(_ sender: UIBarButtonItem) {
         self.navigationController?.popViewController(animated: true)
     }
