@@ -8,7 +8,13 @@
 
 import UIKit
 import SVProgressHUD
+import CoreBluetooth
 
 class AppConstants: NSObject {
 
+    static let sharedInstance = AppConstants()
+    
+    var centralManager = CBCentralManager()
+    var blePeripheral : CBPeripheral?
+    
 }

@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import SVProgressHUD
 
 class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -15,36 +16,47 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
     
     let reuseIdentifier = "DetailCollectionCell"
     var titleText = ["Signal:", "Connection:", "Distance:", "Battery:", "Time:"]
-    var peripheralDetails : CBPeripheral!
+//    var peripheralDetails : CBPeripheral!
     var rSSINo = Int()
-    
-    
+//    var timer = Timer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         UIDevice.current.isBatteryMonitoringEnabled = true
-        print(peripheralDetails)
+        print(AppConstants.sharedInstance.blePeripheral!)
+        
+        AppConstants.sharedInstance.blePeripheral?.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didDisconnected), name: ViewController.notificationName, object: nil)
+    }
+    
+    func readRssi() {
+//        timer.invalidate()
+//        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { (Timer) in
+            AppConstants.sharedInstance.blePeripheral!.readRSSI()
+//        }
     }
     
     func getConnectionStatus() -> String {
         var state = ""
-        if peripheralDetails.state == .disconnected {
+        switch AppConstants.sharedInstance.blePeripheral!.state {
+        
+        case .disconnected:
             state = "Disconnected"
-        }
-        else if peripheralDetails.state == .connected {
-            state = "Connected"
-        }
-        else if peripheralDetails.state == .connecting {
+        case .connecting:
             state = "Connecting"
-        }
-        else
-        {
+        case .connected:
+            state = "Connected"
+            readRssi()
+        case .disconnecting:
             state = "Disconnecting"
         }
+
         return state
     }
+    
     func getDistance(rssi: Int) -> String {
         
         var strDistance = ""
@@ -166,6 +178,8 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
         navigationController?.show(deviceLocationVC, sender: self)
     }
     @IBAction func btnBackTap(_ sender: UIBarButtonItem) {
+        AppConstants.sharedInstance.centralManager.cancelPeripheralConnection(AppConstants.sharedInstance.blePeripheral!)
+//        AppConstants.sharedInstance.blePeripheral = nil
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -179,4 +193,17 @@ class DeviceDetailViewController: UIViewController, UICollectionViewDelegate, UI
     }
     */
 
+}
+    
+extension DeviceDetailViewController : CBPeripheralDelegate
+{
+    func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        rSSINo = Int(truncating: RSSI)
+        collectionView.reloadData()
+    }
+    
+    @objc func didDisconnected() {
+        SVProgressHUD.showInfo(withStatus: "This Peripheral is Disconnected")
+        collectionView.reloadData()
+    }
 }

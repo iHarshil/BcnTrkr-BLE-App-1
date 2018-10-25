@@ -39,6 +39,10 @@ class FaqViewController: UIViewController, UITableViewDelegate, UITableViewDataS
         cell?.textLabel?.numberOfLines = 0
         return cell!
     }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50.0
+    }
 
     /*
     // MARK: - Navigation

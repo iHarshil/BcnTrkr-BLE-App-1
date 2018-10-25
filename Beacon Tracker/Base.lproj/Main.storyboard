@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="e1A-pr-kjE">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="554"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="510"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="dataSource" destination="BYZ-38-t0r" id="uXE-7e-r2Z"/>
@@ -36,7 +36,11 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" title="Device List" id="Uja-XT-FaX">
+                        <barButtonItem key="leftBarButtonItem" image="tekt_logo_white" style="plain" id="U5e-RH-R0s">
+                            <color key="tintColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="SCAN" id="Laj-He-Ems">
                             <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
@@ -44,6 +48,7 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="btnScan" destination="Laj-He-Ems" id="frd-bl-JnR"/>
                         <outlet property="tableView" destination="e1A-pr-kjE" id="Z5k-yx-Hi9"/>
@@ -221,9 +226,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="Zri-Sw-pIq">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="554"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Zri-Sw-pIq">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="510"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="dataSource" destination="yor-z7-Zxa" id="6AR-KJ-qdi"/>
                                     <outlet property="delegate" destination="yor-z7-Zxa" id="yDa-rP-0Id"/>
@@ -239,7 +244,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Q6u-qp-rZd"/>
                     </view>
-                    <navigationItem key="navigationItem" title="FAQ" id="6ML-hw-OIu"/>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="FAQ" id="6ML-hw-OIu">
+                        <barButtonItem key="leftBarButtonItem" image="tekt_logo_white" style="plain" id="IU6-Ts-qwo">
+                            <color key="tintColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="Zri-Sw-pIq" id="okW-Y7-vGM"/>
                     </connections>
@@ -312,7 +323,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Rm4-QY-yf3"/>
                     </view>
-                    <navigationItem key="navigationItem" title="About Us" id="wSM-sy-xEU"/>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="About Us" id="wSM-sy-xEU">
+                        <barButtonItem key="leftBarButtonItem" image="tekt_logo_white" style="plain" id="coL-YL-UTs">
+                            <color key="tintColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4ul-r3-Sny" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -414,5 +431,6 @@
         <image name="list" width="24" height="24"/>
         <image name="logo" width="512" height="512"/>
         <image name="map" width="30" height="30"/>
+        <image name="tekt_logo_white" width="49" height="71"/>
     </resources>
 </document>
